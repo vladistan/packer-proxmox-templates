@@ -33,8 +33,8 @@ source $build_conf
 
 [[ -z "$vm_default_user" ]] && die_var_unset "vm_default_user"
 [[ -z "$default_vm_id" ]] && die_var_unset "default_vm_id"
-[[ -z "$iso_url" ]] && die_var_unset "iso_url"
-[[ -z "$iso_sha256_url" ]] && die_var_unset "iso_sha256_url"
+#[[ -z "$iso_url" ]] && die_var_unset "iso_url"
+#[[ -z "$iso_sha256_url" ]] && die_var_unset "iso_sha256_url"
 [[ -z "$iso_directory" ]] && die_var_unset "iso_directory"
 
 ## check that build-mode (proxmox|debug) is passed to script
@@ -75,15 +75,15 @@ fi
 
 ## download ISO and Ansible role
 printf "\n=> Downloading and checking ISO\n\n"
-iso_filename=$(basename $iso_url)
-wget -P $iso_directory -N $iso_url                  # only re-download when newer on the server
-wget --no-verbose $iso_sha256_url -O $iso_directory/SHA256SUMS  # always download and overwrite
-(cd $iso_directory && cat $iso_directory/SHA256SUMS | grep $iso_filename | sha256sum --check)
-if [ $? -eq 1 ]; then echo "ISO checksum does not match!"; exit 1; fi
+#iso_filename=$(basename $iso_url)
+#wget -P $iso_directory -N $iso_url                  # only re-download when newer on the server
+#wget --no-verbose $iso_sha256_url -O $iso_directory/SHA256SUMS  # always download and overwrite
+#(cd $iso_directory && cat $iso_directory/SHA256SUMS | grep $iso_filename | sha256sum --check)
+#if [ $? -eq 1 ]; then echo "ISO checksum does not match!"; exit 1; fi
 
 printf "\n=> Downloading Ansible role\n\n"
 # will always overwrite role to get latest version from Github
-ansible-galaxy install --force -p playbook/roles -r playbook/requirements.yml
+#ansible-galaxy install --force -p playbook/roles -r playbook/requirements.yml
 [[ -f playbook/roles/ansible-initial-server/tasks/main.yml ]] || { echo "Ansible role not found."; exit 1; }
 
 # the vm_default_user name will be used by Packer and Ansible
@@ -125,6 +125,8 @@ case $target in
         ;;
     debug)
         printf "\n==> DEBUG: Build and create a Proxmox template.\n\n"
+	echo "ISO Filename: $iso_filename : press enter"
+	read n
         PACKER_LOG=1 packer build -debug -on-error=ask -var iso_filename=$iso_filename -var vm_ver=$vm_ver -var vm_id=$vm_id -var proxmox_password=$proxmox_password -var ssh_password=$ssh_password $template_name
         ;;
     *)

@@ -41,11 +41,11 @@
             "os": "l26",
             "http_directory": "http",
 
-            "node": "proxmox",
+            "node": "pve3",
             "network_adapters": [
               {
                 "model": "virtio",
-                "bridge": "vmbr1"
+                "bridge": "vmbr0"
               }
             ],
             "disks": [
@@ -60,7 +60,7 @@
             "ssh_username": "{{user `ssh_username`}}",
             "ssh_password": "{{user `ssh_password`}}",
             "ssh_timeout": "30m",
-            "iso_file": "local:iso/{{user `iso_filename`}}",
+            "iso_file": "VMTemplates:iso/{{user `iso_filename`}}",
             "unmount_iso": true,
             "boot_wait": "10s",
             "boot_command": [
