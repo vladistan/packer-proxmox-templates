@@ -1,14 +1,38 @@
 ---
 
 iserver_hostname: ubuntu2004-kvm
-iserver_sshkey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDK1zNq5zsVbbN/gLdYqxlb5CROsR1dBNBgRFzzCJUL3ncU2dDHLHWi0L/FafwWt6MQ7vePu7catLDegY2fs1QB0KYvy21fD3+9ONBs7KcFlmuyqjLJ9VAoLWW5Tv3I9eZNgpd9k6CvYphKa1Owq43ye+quQRI4J+2nb7Zhl2WTQ1N2WBwZbmf0ErTHwa+mC7frTRBYh6ddyXp9KRULH89y/6cVpL6uQyFzIr6yWowUbJ8lX3fA9e7RAxkG76X54sMa65oq3Bog04ylJ4n/xZCXO449BZjAZHcJuDcFLXrwIo52t+Q6gIEnXInTiii26/ZWbnzzheggjkpQ77tCg03t christian@Chris-GigaMac.local"
+iserver_sshkey: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAlwpnxq9zVvcOtSrJXYmGzH1Cgk7ITw2LC8leF6tiZlq76f1IGsKUcz4UG+ZB0WJoFWz+SofEp/ZRhqHIdJj/lSmXiC4bHzCIrBf3JkYrTRJBN5lproblA2cj3bNRrzHmsglaO3R1HSVMlvFyZyzNUjQMXbulbZDpVjt3dE1tYR2DxdW8xvAlPkV9p47+lT9jUWOYrs/I3Ozu/cmm8jmSahIMF0RF2X/xfm2p9KHE8KZhTcaRjP1n9bcI8+bTlrDPSp+x1tUOu5VHzOmEWWXXl/I1xaUVVPRQu1CDhbp7Qi1INam+8YJAlWVVFPsSdDTt1d1zi8iU161UmY/XULpSDQ== vlad@vlad-korolevs-macbook-air.local"
 
 iserver_repos:
-  - deb http://repo.myloc.de/ubuntu/ focal main restricted universe multiverse
-  - deb-src http://repo.myloc.de/ubuntu/ focal main restricted universe multiverse
-  - deb http://repo.myloc.de/ubuntu/ focal-updates main restricted universe multiverse
-  - deb-src http://repo.myloc.de/ubuntu/ focal-updates main restricted universe multiverse
-  - deb http://repo.myloc.de/ubuntu/ focal-backports main restricted universe multiverse
-  - deb-src http://repo.myloc.de/ubuntu/ focal-backports main restricted universe multiverse
-  - deb http://security.ubuntu.com/ubuntu focal-security main restricted universe multiverse
-  - deb-src http://security.ubuntu.com/ubuntu focal-security main restricted universe multiverse
+  - deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse
+  - deb-src http://archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse
+  - deb http://archive.ubuntu.com/ubuntu/ focal-security main restricted universe multiverse
+  - deb-src http://archive.ubuntu.com/ubuntu/ focal-security main restricted universe multiverse
+  - deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
+  - deb-src http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
+  - deb http://archive.canonical.com/ubuntu focal partner
+  - deb-src http://archive.canonical.com/ubuntu focal partner
+
+iserver_deb_packages:
+  - openssh-server   # needed for Travis testing
+  - qemu-guest-agent # needed by packer
+  - sudo
+  - python-apt       # used by ansible
+  - haveged          # prevent vm boot delays
+  - net-tools        # includes ifconfig, netstat
+  - nano             # set as default editor in .profile
+  - psmisc           # includes pstree
+  - wget
+  - curl
+  - lsof
+  - lshw
+  - ncdu
+  - netstat-nat
+  - dnsutils
+  - pv
+  - screen
+
+iserver_domain: home.v-lad.org
+
+iserver_deb_user_profile: |
+  EDITOR=/usr/bin/vim
