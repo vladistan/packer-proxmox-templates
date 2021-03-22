@@ -3,7 +3,9 @@
 iserver_hostname: ubuntu2004-kvm
 iserver_sshkey: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAlwpnxq9zVvcOtSrJXYmGzH1Cgk7ITw2LC8leF6tiZlq76f1IGsKUcz4UG+ZB0WJoFWz+SofEp/ZRhqHIdJj/lSmXiC4bHzCIrBf3JkYrTRJBN5lproblA2cj3bNRrzHmsglaO3R1HSVMlvFyZyzNUjQMXbulbZDpVjt3dE1tYR2DxdW8xvAlPkV9p47+lT9jUWOYrs/I3Ozu/cmm8jmSahIMF0RF2X/xfm2p9KHE8KZhTcaRjP1n9bcI8+bTlrDPSp+x1tUOu5VHzOmEWWXXl/I1xaUVVPRQu1CDhbp7Qi1INam+8YJAlWVVFPsSdDTt1d1zi8iU161UmY/XULpSDQ== vlad@vlad-korolevs-macbook-air.local"
 
-iserver_repos:
+iserver_ubuntu_repos:
+  - deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse
+  - deb-src http://archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse
   - deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse
   - deb-src http://archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse
   - deb http://archive.ubuntu.com/ubuntu/ focal-security main restricted universe multiverse
@@ -34,5 +36,9 @@ iserver_deb_packages:
 
 iserver_domain: home.v-lad.org
 
-iserver_deb_user_profile: |
-  EDITOR=/usr/bin/vim
+iserver_bashrc_user_ubuntu: |
+  export PS1="\[\033[1;34m\][\u@\h:\w]$\[\033[0m\] "
+  export EDITOR=/usr/bin/vim
+
+iserver_motd_welcome:
+  echo "V-Lad template: $PRETTY_NAME"
