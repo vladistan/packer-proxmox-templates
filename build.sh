@@ -97,8 +97,6 @@ mkdir -p http
 # Debian & Ubuntu
 ## Insert the password hashes for root and default user into preseed.cfg using a Jinja2 template
 if [[ -f preseed.cfg.j2 ]]; then
-    export password_hash1=$(mkpasswd -R 1000000 -m sha-512 $ssh_password)
-    export password_hash2=$(mkpasswd -R 1000000 -m sha-512 $ssh_password)
     printf "\n=> Customizing auto preseed.cfg\n"
     j2 preseed.cfg.j2 > http/preseed.cfg
     [[ -f http/preseed.cfg ]] || { echo "Customized preseed.cfg file not found."; exit 1; }
@@ -112,6 +110,13 @@ if [[ -f install.conf.j2 ]]; then
     printf "\n=> Customizing install.conf\n"
     j2 install.conf.j2 > http/install.conf
     [[ -f http/install.conf ]] || { echo "Customized install.conf file not found."; exit 1; }
+fi
+
+# Centos
+if [[ -f ks.cfg.j2 ]]; then
+    printf "\n=> Customizing ks.cfg\n"
+    j2 ks.cfg.j2 > http/ks.cfg
+    [[ -f http/ks.cfg ]] || { echo "Customized install.conf file not found."; exit 1; }
 fi
 
 vm_ver=$(git describe --tags)
