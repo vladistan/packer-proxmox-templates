@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 
-# 'vm_default_user' and 'vm_memory' will be sourced from build.conf
-# and passed as environment variables to Packer
+# Many variables are sourced from build.conf and passed as environment variables to Packer.
+# The vm_default_user name will be used by Packer and Ansible.
+# (j2 is a better solution than 'envsubst' which messes up '$' in the text unless you specify each variable)
+# vm_default_user
+# vm_memory
+# proxmox_host
+# iso_filename
+# vm_ver
+# vm_id
+# proxmox_password
+# ssh_password
+
 set -o allexport
 build_conf="build.conf"
 
@@ -32,6 +42,8 @@ function die_var_unset {
 source $build_conf
 
 [[ -z "$vm_default_user" ]] && die_var_unset "vm_default_user"
+[[ -z "$vm_memory" ]] && die_var_unset "vm_memory"
+[[ -z "$proxmox_host" ]] && die_var_unset "proxmox_host"
 [[ -z "$default_vm_id" ]] && die_var_unset "default_vm_id"
 #[[ -z "$iso_url" ]] && die_var_unset "iso_url"
 #[[ -z "$iso_sha256_url" ]] && die_var_unset "iso_sha256_url"
@@ -86,17 +98,13 @@ printf "\n=> Downloading Ansible role\n\n"
 #ansible-galaxy install --force -p playbook/roles -r playbook/requirements.yml
 [[ -f playbook/roles/ansible-initial-server/tasks/main.yml ]] || { echo "Ansible role not found."; exit 1; }
 
-# the vm_default_user name will be used by Packer and Ansible
-export vm_default_user=$vm_default_user
-export ssh_password=$ssh_password
-
 mkdir -p http
-
-# j2 is the better solution than 'envsubst' which messes up '$' in the text unless you specify each variable
 
 # Debian & Ubuntu
 ## Insert the password hashes for root and default user into preseed.cfg using a Jinja2 template
 if [[ -f preseed.cfg.j2 ]]; then
+    password_hash1=$(mkpasswd -R 1000000 -m sha-512 $ssh_password)
+    password_hash2=$(mkpasswd -R 1000000 -m sha-512 $ssh_password)
     printf "\n=> Customizing auto preseed.cfg\n"
     j2 preseed.cfg.j2 > http/preseed.cfg
     [[ -f http/preseed.cfg ]] || { echo "Customized preseed.cfg file not found."; exit 1; }
@@ -105,8 +113,8 @@ fi
 # OpenBSD
 ## Insert the password hashes for root and default user into install.conf using a Jinja2 template
 if [[ -f install.conf.j2 ]]; then
-    export password_hash1=$(python3 -c "import os, bcrypt; print(bcrypt.hashpw(os.environ['ssh_password'], bcrypt.gensalt(10)))")
-    export password_hash2=$(python3 -c "import os, bcrypt; print(bcrypt.hashpw(os.environ['ssh_password'], bcrypt.gensalt(10)))")
+    password_hash1=$(python3 -c "import os, bcrypt; print(bcrypt.hashpw(os.environ['ssh_password'], bcrypt.gensalt(10)))")
+    password_hash2=$(python3 -c "import os, bcrypt; print(bcrypt.hashpw(os.environ['ssh_password'], bcrypt.gensalt(10)))")
     printf "\n=> Customizing install.conf\n"
     j2 install.conf.j2 > http/install.conf
     [[ -f http/install.conf ]] || { echo "Customized install.conf file not found."; exit 1; }
@@ -121,18 +129,18 @@ fi
 
 vm_ver=$(git describe --tags)
 
+
 ## Call Packer build with the provided data
 case $target in
     proxmox)
         printf "\n==> Build and create a Proxmox template.\n\n"
-        # single quotes such as -var 'vm_id=$vm_id' do not work here
-        packer build -var iso_filename=$iso_filename -var vm_ver=$vm_ver -var vm_id=$vm_id -var proxmox_password=$proxmox_password -var ssh_password=$ssh_password $template_name
+        ansible_verbosity="-v"
+        packer build $template_name
         ;;
     debug)
         printf "\n==> DEBUG: Build and create a Proxmox template.\n\n"
-	echo "ISO Filename: $iso_filename : press enter"
-	read n
-        PACKER_LOG=1 packer build -debug -on-error=ask -var iso_filename=$iso_filename -var vm_ver=$vm_ver -var vm_id=$vm_id -var proxmox_password=$proxmox_password -var ssh_password=$ssh_password $template_name
+        ansible_verbosity="-vvvv"
+        PACKER_LOG=1 packer build -debug -on-error=ask $template_name
         ;;
     *)
         help
