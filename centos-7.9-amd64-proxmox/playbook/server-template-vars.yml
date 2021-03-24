@@ -34,6 +34,14 @@ iserver_deb_packages:
   - pv
   - screen
 
+iserver_rpm_packages:
+  - redhat-lsb-core
+  - wget
+  - curl
+  - htop
+
+iserver_centos_enable_epel: true
+
 iserver_domain: home.v-lad.org
 
 iserver_bashrc_user_ubuntu: |

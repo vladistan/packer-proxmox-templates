@@ -21,6 +21,7 @@ reboot --eject
 user --name={{ env("vm_default_user") }} --plaintext --password {{ env("ssh_password") }}
 
 %packages --nobase --ignoremissing --excludedocs --instLangs=en_US.utf8
+qemu-guest-agent
 openssh-clients
 sudo
 selinux-policy-devel

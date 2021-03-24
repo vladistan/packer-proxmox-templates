@@ -37,7 +37,7 @@
             "vm_name": "{{user `vm_name`}}",
             "template_description":"{{user `template_description`}}",
             "memory": "{{user `vm_memory`}}",
-            "cores": "2",
+            "cores": "4",
             "os": "l26",
             "http_directory": "http",
 
