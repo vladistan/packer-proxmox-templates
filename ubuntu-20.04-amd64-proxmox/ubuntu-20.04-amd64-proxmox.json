@@ -6,6 +6,7 @@
         "proxmox_password": "{{env `proxmox_password`}}",
         "proxmox_host": "{{env `proxmox_host`}}",
         "iso_filename": "{{env `iso_filename`}}",
+        "ansible_verbosity": "{{env `ansible_verbosity`}}",
         "vm_id": "{{env `vm_id`}}",
         "vm_name": "ubuntu2004-tmpl",
         "template_description": "Ubuntu 20.04 x86_64 template built with packer ({{env `vm_ver`}}). Username: {{env `vm_default_user`}}",
