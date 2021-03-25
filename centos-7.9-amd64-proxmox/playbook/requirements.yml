@@ -1,2 +1,2 @@
-- src: https://github.com/chriswayg/ansible-initial-server.git
+- src: https://github.com/vladistan/ansible-initial-server.git
   version: master
