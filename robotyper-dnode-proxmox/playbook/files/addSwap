@@ -1,0 +1,6 @@
+for x in 1 2 3 4
+do
+  dd if=/dev/zero of=/mnt/swapfile$x bs=2048 count=524800
+  mkswap  /mnt/swapfile$x
+  swapon /mnt/swapfile$x
+done

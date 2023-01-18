@@ -1,0 +1,22 @@
+cd /home/ec2-user
+export HOME=/home/ec2-user
+export DB_FILE=$1
+
+
+./addSwap &
+
+if [ $DB_FILE = eng1-M- ]; then
+    echo "ENG1 Prefix DS detected"
+    export DB_FILE=eng1-M
+    export PART=ALL
+fi
+
+echo Requesting $DB_FILE
+
+aws s3 ls s3://robotyper-vlad.org/redis/${DB_FILE}/
+aws s3 cp s3://robotyper-vlad.org/redis/${DB_FILE}/dump.rdb ${HOME}/redis-2.2.7/dump.rdb
+
+
+cd redis-2.2.7
+sysctl vm.overcommit_memory=1
+src/redis-server redis.conf
