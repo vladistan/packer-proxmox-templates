@@ -1,15 +1,14 @@
 {
-    "description": "Build Ubuntu 20.04 (focal) x86_64 Proxmox template",
+    "description": "Robotyper Datanode template",
     "variables": {
         "proxmox_url": "{{env `proxmox_url`}}",
         "proxmox_username": "root@pam",
         "proxmox_password": "{{env `proxmox_password`}}",
         "proxmox_host": "{{env `proxmox_host`}}",
-        "iso_filename": "{{env `iso_filename`}}",
         "ansible_verbosity": "{{env `ansible_verbosity`}}",
         "vm_id": "{{env `vm_id`}}",
         "vm_name": "centos79-tmpl",
-        "template_description": "Centos 7.9 x86_64 template built with packer ({{env `vm_ver`}}). Username: {{env `vm_default_user`}}",
+        "template_description": "Robotyper Datanode template built with packer ({{env `vm_ver`}}). Username: {{env `vm_default_user`}}",
         "vm_default_user": "{{env `vm_default_user`}}",
         "vm_memory": "{{env `vm_memory`}}",
         "ssh_username": "root",
@@ -20,30 +19,25 @@
       {
         "type": "ansible",
         "playbook_file": "./playbook/server-template.yml",
-        "extra_arguments": [
-          "{{user `ansible_verbosity`}}",
-          "--extra-vars", "vm_default_user={{user `vm_default_user`}}",
-          "--tags", "all,is_template",
-          "--skip-tags", "alpine,debuntu,openbsd"
-        ],
         "ansible_env_vars": [ "ANSIBLE_CONFIG=./playbook/ansible.cfg", "ANSIBLE_FORCE_COLOR=True" ]
       }
     ],
     "builders": [
         {
-            "type": "proxmox",
+            "type": "proxmox-clone",
             "proxmox_url":  "{{user `proxmox_url`}}",
             "insecure_skip_tls_verify": true,
             "username": "{{user `proxmox_username`}}",
             "password": "{{user `proxmox_password`}}",
             "vm_id":  "{{user `vm_id`}}",
             "vm_name": "{{user `vm_name`}}",
+            "clone_vm": "centos79-tmpl",
+            "task_timeout": "10m",
             "template_description":"{{user `template_description`}}",
+            "template_name":"robo-data-node",
             "memory": "{{user `vm_memory`}}",
             "cores": "2",
-            "os": "l26",
-            "http_directory": "http",
-
+            "os": "l26",          
             "node": "{{user `proxmox_host`}}",
             "network_adapters": [
               {
@@ -51,27 +45,10 @@
                 "bridge": "vmbr0"
               }
             ],
-            "disks": [
-              {
-                "type": "sata",
-                "disk_size": "8G",
-                "storage_pool": "local-lvm",
-                "storage_pool_type": "directory",
-                "format": "qcow2"
-              }
-            ],
-            "ssh_username": "{{user `ssh_username`}}",
-            "ssh_password": "{{user `ssh_password`}}",
+            "ssh_username": "vlad",
+            "ssh_agent_auth": true,
             "ssh_timeout": "15m",
-            "iso_file": "VMTemplates6:iso/{{user `iso_filename`}}",
-            "unmount_iso": true,
-            "boot_wait": "10s",
-            "boot_command": [
-              "<up><wait>",
-              "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg",
-              "<enter>",
-              "<wait>"
-            ]
+            "boot_wait": "10s"
         }
     ],
     "post-processors": [

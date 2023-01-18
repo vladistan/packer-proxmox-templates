@@ -55,7 +55,7 @@
               {
                 "type": "scsi",
                 "disk_size": "8G",
-                "storage_pool": "local",
+                "storage_pool": "local-lvm",
                 "storage_pool_type": "directory",
                 "format": "qcow2"
               }
@@ -63,7 +63,7 @@
             "ssh_username": "{{user `ssh_username`}}",
             "ssh_password": "{{user `ssh_password`}}",
             "ssh_timeout": "15m",
-            "iso_file": "VMTemplates:iso/{{user `iso_filename`}}",
+            "iso_file": "VMTemplates6:iso/{{user `iso_filename`}}",
             "unmount_iso": true,
             "boot_wait": "10s",
             "boot_command": [
@@ -81,7 +81,12 @@
       {
         "type": "shell-local",
         "inline_shebang": "/bin/bash -e",
-        "inline": ["qm set {{user `vm_id`}} --scsihw virtio-scsi-pci --serial0 socket --vga serial0"]
+        "inline": ["echo {{user `proxmox_host`}}"]
+      },
+      {
+        "type": "shell-local",
+        "inline_shebang": "/bin/bash -e",
+        "inline": ["ssh root@{{user `proxmox_host`}} qm set {{user `vm_id`}} --scsihw virtio-scsi-pci --serial0 socket --vga serial0"]
       }
   ]
 }
