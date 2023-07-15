@@ -45,9 +45,11 @@ source $build_conf
 [[ -z "$vm_memory" ]] && die_var_unset "vm_memory"
 [[ -z "$proxmox_host" ]] && die_var_unset "proxmox_host"
 [[ -z "$default_vm_id" ]] && die_var_unset "default_vm_id"
-#[[ -z "$iso_url" ]] && die_var_unset "iso_url"
-#[[ -z "$iso_sha256_url" ]] && die_var_unset "iso_sha256_url"
-[[ -z "$iso_directory" ]] && die_var_unset "iso_directory"
+[[ -z "$iso_url" ]] && die_var_unset "iso_url"
+if [[ -z "$iso_prestaged" ]]; then
+  [[ -z "$iso_sha256_url" ]] && die_var_unset "iso_sha256_url"
+  [[ -z "$iso_directory" ]] && die_var_unset "iso_directory"
+fi
 
 ## check that build-mode (proxmox|debug) is passed to script
 target=${1:-}
@@ -58,9 +60,13 @@ vm_id=${2:-$default_vm_id}
 printf "\n==> Using VM ID: $vm_id with default user: '$vm_default_user'\n"
 
 ## template_name is based on name of current directory, check it exists
-template_name="${PWD##*/}.json"
+if [[ -n "$(find . -maxdepth 1 -name '*.pkr.hcl' -print -quit)" ]]; then
+  template_name="."
+else
+  template_name="${PWD##*/}.json"
+  [[ -f $template_name ]] || { echo "Template (${template_name}) not found."; exit 1; }
+fi
 
-[[ -f $template_name ]] || { echo "Template (${template_name}) not found."; exit 1; }
 
 ## check that prerequisites are installed
 [[ $(packer --version)  ]] || { echo "Please install 'Packer'"; exit 1; }
@@ -86,18 +92,20 @@ fi
 [[ -z "$ssh_password" ]] && echo "The SSH Password is required." && exit 1
 
 ## download ISO and Ansible role
-printf "\n=> Downloading and checking ISO\n\n"
-#iso_filename=$(basename $iso_url)
-#wget -P $iso_directory -N $iso_url                  # only re-download when newer on the server
-#wget --no-verbose $iso_sha256_url -O $iso_directory/SHA256SUMS  # always download and overwrite
-#(cd $iso_directory && cat $iso_directory/SHA256SUMS | grep $iso_filename | sha256sum --check)
-#if [ $? -eq 1 ]; then echo "ISO checksum does not match!"; exit 1; fi
+if [[ -z "$iso_prestaged" ]]; then
 
-printf "\n=> Downloading Ansible role\n\n"
-# will always overwrite role to get latest version from Github
-#ansible-galaxy install --force -p playbook/roles -r playbook/requirements.yml
+    printf "\n=> Downloading and checking ISO\n\n"
+    iso_filename=$(basename $iso_url)
+    wget -P $iso_directory -N $iso_url                  # only re-download when newer on the server
+    wget --no-verbose $iso_sha256_url -O $iso_directory/SHA256SUMS  # always download and overwrite
+    (cd $iso_directory && cat $iso_directory/SHA256SUMS | grep $iso_filename | sha256sum --check)
+    if [ $? -eq 1 ]; then echo "ISO checksum does not match!"; exit 1; fi
 
-[[ -f playbook/roles/ansible-initial-server/tasks/main.yml ]] || { echo "Ansible role not found."; exit 1; }
+    printf "\n=> Downloading Ansible role\n\n"
+    # will always overwrite role to get latest version from Github
+    ansible-galaxy install --force -p playbook/roles -r playbook/requirements.yml
+    [[ -f playbook/roles/ansible-initial-server/tasks/main.yml ]] || { echo "Ansible role not found."; exit 1; }
+fi
 
 mkdir -p http
 
@@ -136,7 +144,7 @@ case $target in
     proxmox)
         printf "\n==> Build and create a Proxmox template.\n\n"
         ansible_verbosity="-v"
-        packer build $template_name
+        packer build -on-error=ask $template_name
         ;;
     debug)
         printf "\n==> DEBUG: Build and create a Proxmox template.\n\n"
