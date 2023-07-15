@@ -125,11 +125,11 @@ build {
 
   sources = ["source.proxmox.centos"]
 
-  # provisioner "ansible" {
-  #   ansible_env_vars = ["ANSIBLE_CONFIG=./playbook/ansible.cfg", "ANSIBLE_FORCE_COLOR=True"]
-  #   extra_arguments  = ["${var.ansible_verbosity}", "--extra-vars", "vm_default_user=${var.vm_default_user}", "--tags", "all,is_template", "--skip-tags", "alpine,debuntu,openbsd"]
-  #   playbook_file    = "./playbook/server-template.yml"
-  # }
+  provisioner "ansible" {
+    ansible_env_vars = ["ANSIBLE_CONFIG=./playbook/ansible.cfg", "ANSIBLE_FORCE_COLOR=True"]
+    extra_arguments  = ["${var.ansible_verbosity}", "--extra-vars", "vm_default_user=${var.vm_default_user}", "--tags", "all,is_template", "--skip-tags", "alpine,debuntu,openbsd"]
+    playbook_file    = "./playbook/server-template.yml"
+  }
 
   post-processor "shell-local" {
     inline         = ["qm set ${var.vm_id} --scsihw virtio-scsi-pci --serial0 socket --vga serial0"]
