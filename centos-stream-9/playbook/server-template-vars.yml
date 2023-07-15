@@ -1,0 +1,44 @@
+---
+
+iserver_hostname: centos9-kvm
+
+iserver_deb_packages:
+  - curl
+  - dnsutils
+  - haveged          # prevent vm boot delays
+  - lshw
+  - lsof
+  - nano             # set as default editor in .profile
+  - ncdu
+  - net-tools        # includes ifconfig, netstat
+  - netstat-nat
+  - openssh-server   # needed for Travis testing
+  - psmisc           # includes pstree
+  - pv
+  - python-apt       # used by ansible
+  - qemu-guest-agent # needed by packer
+  - screen
+  - sudo
+  - wget
+
+iserver_rpm_packages:
+  - htop
+  - curl
+  - haveged          # prevent vm boot delays
+  - ncdu
+  - net-tools        # includes ifconfig, netstat
+  - psmisc           # includes pstree
+  - pv
+  - tmux
+  - wget
+
+iserver_centos_enable_epel: true
+
+iserver_domain: home.v-lad.org
+
+iserver_bashrc_user_ubuntu: |
+  export PS1="\[\033[1;34m\][\u@\h:\w]$\[\033[0m\] "
+  export EDITOR=/usr/bin/vim
+
+iserver_motd_welcome:
+  echo "V-Lad template: $PRETTY_NAME"

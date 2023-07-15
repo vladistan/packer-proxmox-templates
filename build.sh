@@ -100,12 +100,13 @@ if [[ -z "$iso_prestaged" ]]; then
     wget --no-verbose $iso_sha256_url -O $iso_directory/SHA256SUMS  # always download and overwrite
     (cd $iso_directory && cat $iso_directory/SHA256SUMS | grep $iso_filename | sha256sum --check)
     if [ $? -eq 1 ]; then echo "ISO checksum does not match!"; exit 1; fi
-
-    printf "\n=> Downloading Ansible role\n\n"
-    # will always overwrite role to get latest version from Github
-    ansible-galaxy install --force -p playbook/roles -r playbook/requirements.yml
-    [[ -f playbook/roles/ansible-initial-server/tasks/main.yml ]] || { echo "Ansible role not found."; exit 1; }
 fi
+
+printf "\n=> Downloading Ansible role\n\n"
+# will always overwrite role to get latest version from Github
+ansible-galaxy install --force -p playbook/roles -r playbook/requirements.yml
+[[ -f playbook/roles/ansible-initial-server/tasks/main.yml ]] || { echo "Ansible role not found."; exit 1; }
+
 
 mkdir -p http
 
