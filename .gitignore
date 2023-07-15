@@ -27,3 +27,4 @@ install.conf
 
 # others
 cloud-config.yml
+/centos-stream-9/.envrc
