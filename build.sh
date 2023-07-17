@@ -137,6 +137,15 @@ if [[ -f ks.cfg.j2 ]]; then
     [[ -f http/ks.cfg ]] || { echo "Customized install.conf file not found."; exit 1; }
 fi
 
+if [[ -f user-data.j2 ]]; then
+    password_hash1=$(echo $ssh_password | openssl passwd -6 -stdin)
+    password_hash2=$(echo $ssh_password | openssl passwd -6 -stdin)
+
+    printf "\n=> Customizing user-data\n"
+    j2 user-data.j2 > http/user-data
+    [[ -f http/user-data ]] || { echo "Customized user-data file not found."; exit 1; }
+fi
+
 vm_ver=$(git describe --tags)
 
 

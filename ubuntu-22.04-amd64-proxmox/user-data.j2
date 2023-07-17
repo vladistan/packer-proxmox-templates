@@ -1,0 +1,60 @@
+#cloud-config
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+# WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+# OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+# Ubuntu Server 22.04 LTS
+autoinstall:
+  version: 1
+  apt:
+    geoip: true
+    disable_components: []
+    preserve_sources_list: false
+    primary:
+      - arches: [amd64, i386]
+        uri: http://us.archive.ubuntu.com/ubuntu
+      - arches: [default]
+        uri: http://ports.ubuntu.com/ubuntu-ports
+  early-commands:
+    - sudo systemctl stop ssh
+  locale: en_US.UTF-8
+  keyboard:
+    layout: us
+  identity:
+    hostname: ubuntu2204-tmpl
+    username: {{ vm_default_user }}
+    password: "{{ password_hash1 }}"
+  storage:
+    layout:
+      name: direct
+  ssh:
+    install-server: true
+    allow-pw: false
+    authorized-keys:
+      - "{{ ssh_public_key }}"
+  packages:
+    - openssh-server
+    - sudo
+    - qemu-guest-agent
+    - haveged
+    - zsh
+    - wget
+    - tasksel
+  user-data:
+    disable_root: false
+    timezone: UTC
+    users:
+     - name: {{ vm_default_user }}
+       sudo: ALL=(ALL) NOPASSWD:ALL
+       groups: users, admin
+       shell: /bin/zsh
+       ssh-authorized-keys:
+         - "{{ env("ssh_public_key") }}"
+     - name: root
+       shell: /bin/bash
+       ssh-authorized-keys:
+         - "{{ env("ssh_public_key") }}"
+
+  late-commands:
+    - echo '{{ vm_default_user }} ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/{{ vm_default_user }}

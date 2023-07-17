@@ -1,4 +1,3 @@
-
 variable "ansible_verbosity" {
   type    = string
   default = "${env("ansible_verbosity")}"
@@ -47,7 +46,7 @@ variable "ssh_agent_auth" {
 
 variable "template_description" {
   type    = string
-  default = "Centos 9 x86_64 template built with packer (${env("vm_ver")}). Username: ${env("vm_default_user")}"
+  default = "Ubuntu 22.04 x86_64 template built with packer (${env("vm_ver")}). Username: ${env("vm_default_user")}"
 }
 
 variable "vm_default_user" {
@@ -67,14 +66,21 @@ variable "vm_memory" {
 
 variable "vm_name" {
   type    = string
-  default = "centos9-tmpl"
+  default = "ubuntu2204-tmpl"
 }
 
-source "proxmox" "centos" {
+source "proxmox" "ubuntu" {
   
-  boot_command = ["<up><wait>", "<tab> inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg", "<enter>", "<wait>"]
   boot_wait    = "10s"
-  
+  boot_command = [
+    "c<wait>",
+    "linux /casper/vmlinuz --- autoinstall ds=\"nocloud-net;seedfrom=http://{{.HTTPIP}}:{{.HTTPPort}}/\"",
+    "<enter><wait><wait><wait>",
+    "initrd <wait>/casper/<wait>initrd<wait>",
+    "<enter><wait>",
+    "boot",
+    "<enter>"
+  ]
 
   username             = "${var.proxmox_username}"
   password             = "${var.proxmox_password}"
@@ -82,8 +88,7 @@ source "proxmox" "centos" {
 
   ssh_username         = "${var.ssh_username}"
   ssh_agent_auth       = "${var.ssh_agent_auth}"
-  ssh_timeout          = "15m"
-
+  ssh_timeout          = "35m"
   
   cores        = "2"
   cpu_type     = "host"
@@ -91,13 +96,12 @@ source "proxmox" "centos" {
 
 
   disks {
-    disk_size         = "28G"
+    disk_size         = "8G"
     format            = "raw"
     storage_pool      = "Z8"
     storage_pool_type = "directory"
     type              = "sata"
   }
-
   http_directory           = "http"
   insecure_skip_tls_verify = true
   iso_file                 = "${var.iso_url}"
@@ -110,6 +114,9 @@ source "proxmox" "centos" {
   node                 = "${var.proxmox_host}"
   os                   = "l26"
  
+
+
+
   template_description = "${var.template_description}"
   unmount_iso          = true
 
@@ -118,13 +125,13 @@ source "proxmox" "centos" {
 }
 
 build {
-  description = "Build CentOS Stream 9 x86_64 Proxmox template"
+  description = "Build Ubuntu 22.04 (focal) x86_64 Proxmox template"
 
-  sources = ["source.proxmox.centos"]
+  sources = ["source.proxmox.ubuntu"]
 
   provisioner "ansible" {
     ansible_env_vars = ["ANSIBLE_CONFIG=./playbook/ansible.cfg", "ANSIBLE_FORCE_COLOR=True"]
-    extra_arguments  = ["${var.ansible_verbosity}", "--extra-vars", "vm_default_user=${var.vm_default_user}", "--tags", "all,is_template", "--skip-tags", "alpine,debuntu,openbsd"]
+    extra_arguments  = ["${var.ansible_verbosity}", "--extra-vars", "vm_default_user=${var.vm_default_user}", "--tags", "all,is_template", "--skip-tags", "openbsd,alpine,centos"]
     playbook_file    = "./playbook/server-template.yml"
   }
 
