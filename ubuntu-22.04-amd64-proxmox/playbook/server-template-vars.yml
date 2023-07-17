@@ -1,0 +1,52 @@
+---
+
+iserver_hostname: ubuntu2004-kvm
+
+iserver_ubuntu_repos:
+  - deb http://archive.ubuntu.com/ubuntu/ jammy main restricted
+  - deb-src http://archive.ubuntu.com/ubuntu/ jammy main restricted
+  - deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted
+  - deb-src http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted
+  - deb http://archive.ubuntu.com/ubuntu/ jammy universe
+  - deb-src http://archive.ubuntu.com/ubuntu/ jammy universe
+  - deb http://archive.ubuntu.com/ubuntu/ jammy-updates universe
+  - deb-src http://archive.ubuntu.com/ubuntu/ jammy-updates universe
+  - deb http://archive.ubuntu.com/ubuntu/ jammy multiverse
+  - deb-src http://archive.ubuntu.com/ubuntu/ jammy multiverse
+  - deb http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse
+  - deb-src http://archive.ubuntu.com/ubuntu/ jammy-updates multiverse
+  - deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
+  - deb-src http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
+  - deb http://security.ubuntu.com/ubuntu/ jammy-security main restricted
+  - deb-src http://security.ubuntu.com/ubuntu/ jammy-security main restricted
+  - deb http://security.ubuntu.com/ubuntu/ jammy-security universe
+  - deb-src http://security.ubuntu.com/ubuntu/ jammy-security universe
+  - deb http://security.ubuntu.com/ubuntu/ jammy-security multiverse
+  - deb-src http://security.ubuntu.com/ubuntu/ jammy-security multiverse
+
+iserver_deb_packages:
+  - curl
+  - haveged          # prevent vm boot delays
+  - nano             # set as default editor in .profile
+  - ncdu
+  - net-tools        # includes ifconfig, netstat
+  - netstat-nat
+  - psmisc           # includes pstree
+  - pv
+  - python3-apt      # used by ansible (from Debian 11)
+  - sudo
+  - wget
+
+iserver_deb_user_profile: |
+  EDITOR=/usr/bin/vi
+
+
+iserver_bashrc_root_ubuntu: |
+  export PS1="\[\033[1;31m\][\u@\h:\w]#\[\033[0m\] "
+
+iserver_bashrc_user_ubuntu: |
+  export PS1="\[\033[1;34m\][\u@\h:\w]$\[\033[0m\] "
+
+iserver_is_a_vm: True
+
+iserver_root_partition_number: 2
