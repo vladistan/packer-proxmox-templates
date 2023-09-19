@@ -1,10 +1,17 @@
 ## Kickstart commands
+
+# Reference:
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/installation_guide/sect-kickstart-syntax
+
+
 install
 cdrom
 lang en_US.UTF-8
 keyboard us
 network --bootproto=dhcp --noipv6 --onboot=on --device=eth0
 rootpw --plaintext {{ env("ssh_password") }}
+sshkey --username root "{{ env("ssh_public_key") }}"
+
 firewall --disabled
 selinux --permissive
 timezone UTC
@@ -19,20 +26,31 @@ auth --enableshadow --passalgo=sha512 --kickstart
 firstboot --disabled
 reboot --eject
 user --name={{ env("vm_default_user") }} --plaintext --password {{ env("ssh_password") }}
+sshkey --username {{ env("vm_default_user") }} "{{ env("ssh_public_key") }}"
 
+%pre
+# Enable persistent journal from the getgo
+mkdir -p /var/log/journal
+set -x -v
+%end
 %packages --nobase --ignoremissing --excludedocs --instLangs=en_US.utf8
-qemu-guest-agent
-openssh-clients
-sudo
-selinux-policy-devel
-curl
-wget
-nfs-utils
-net-tools
-tar
+bash-completion
 bzip2
+curl
 deltarpm
+net-tools
+nfs-utils
+ntpdate
+openssh-clients
+qemu-guest-agent
+redhat-lsb-core
 rsync
+selinux-policy-devel
+sudo
+tar
+vim-enhanced
+wget
+yum-utils
 -fprintd-pam
 -intltool
 
@@ -41,9 +59,12 @@ rsync
 -microcode_ctl
 %end
 
-
 ## Post-installation scripts.
 %post
+set -x -v
+
+exec 1>/root/ks-post.log 2>&1
+
 # Enable passwordless sudo for default user and permit root login for Packer Ansible provisioner to work
 echo 'Defaults:{{ env("vm_default_user") }} !requiretty' > /etc/sudoers.d/default-user
 echo '{{ env("vm_default_user") }}  ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/default-user
@@ -53,6 +74,8 @@ chmod 440 /etc/sudoers.d/default-user
 
 echo '--> Disabling swap.'
 swapoff -a
+# update all packages now that we're registered in patchmokey
+time yum -y --nogpgcheck update
 
 echo '--> Removing swap from /etc/fstab.'
 # Use `lsblk` to get the UUIDs and filesystems for the partitions used
@@ -92,3 +115,4 @@ DEVICE=eth0
 ONBOOT=yes
 _EOF_
 %end
+

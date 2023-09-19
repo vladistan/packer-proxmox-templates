@@ -1,4 +1,3 @@
-
 variable "ansible_verbosity" {
   type    = string
   default = "${env("ansible_verbosity")}"
@@ -47,7 +46,7 @@ variable "ssh_agent_auth" {
 
 variable "template_description" {
   type    = string
-  default = "Centos 9 x86_64 template built with packer (${env("vm_ver")}). Username: ${env("vm_default_user")}"
+  default = "Centos 7.9 x86_64 template built with packer (${env("vm_ver")}). Username: ${env("vm_default_user")}"
 }
 
 variable "vm_default_user" {
@@ -67,7 +66,7 @@ variable "vm_memory" {
 
 variable "vm_name" {
   type    = string
-  default = "centos9-v2-tmpl"
+  default = "centos79-v2-tmpl"
 }
 
 source "proxmox" "centos" {
@@ -75,7 +74,6 @@ source "proxmox" "centos" {
   boot_command = ["<up><wait>", "<tab> inst.text inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg", "<enter>", "<wait>"]
   boot_wait    = "10s"
   
-
   username             = "${var.proxmox_username}"
   password             = "${var.proxmox_password}"
   proxmox_url          = "${var.proxmox_url}"
@@ -84,14 +82,12 @@ source "proxmox" "centos" {
   ssh_agent_auth       = "${var.ssh_agent_auth}"
   ssh_timeout          = "15m"
 
-  
-  cores        = "2"
+  cores        = "4"
   cpu_type     = "host"
   memory       = "${var.vm_memory}"
 
-
   disks {
-    disk_size         = "10G"
+    disk_size         = "8G"
     format            = "raw"
     storage_pool      = "Z8"
     storage_pool_type = "directory"
@@ -118,7 +114,7 @@ source "proxmox" "centos" {
 }
 
 build {
-  description = "Build CentOS Stream 9 x86_64 Proxmox template"
+  description = "Build CentOS 7.9 x86_64 Proxmox template"
 
   sources = ["source.proxmox.centos"]
 

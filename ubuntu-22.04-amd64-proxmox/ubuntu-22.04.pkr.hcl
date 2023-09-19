@@ -66,7 +66,7 @@ variable "vm_memory" {
 
 variable "vm_name" {
   type    = string
-  default = "ubuntu2204-tmpl"
+  default = "ubuntu2204-v2-tmpl"
 }
 
 source "proxmox" "ubuntu" {
@@ -135,8 +135,9 @@ build {
     playbook_file    = "./playbook/server-template.yml"
   }
 
-  post-processor "shell-local" {
-    inline         = ["qm set ${var.vm_id} --scsihw virtio-scsi-pci --serial0 socket --vga serial0"]
+  # Delete ansible dir
+  provisioner "shell" {
+    inline         = ["sudo rm -rf ./.ansible"]
     inline_shebang = "/bin/bash -e"
   }
 }

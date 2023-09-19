@@ -14,3 +14,5 @@
     - role: ansible-initial-server
       vars:
         iserver_user: "{{ vm_default_user }}"
+        iserver_sshkey: ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAlwpnxq9zVvcOtSrJXYmGzH1Cgk7ITw2LC8leF6tiZlq76f1IGsKUcz4UG+ZB0WJoFWz+SofEp/ZRhqHIdJj/lSmXiC4bHzCIrBf3JkYrTRJBN5lproblA2cj3bNRrzHmsglaO3R1HSVMlvFyZyzNUjQMXbulbZDpVjt3dE1tYR2DxdW8xvAlPkV9p47+lT9jUWOYrs/I3Ozu/cmm8jmSahIMF0RF2X/xfm2p9KHE8KZhTcaRjP1n9bcI8+bTlrDPSp+x1tUOu5VHzOmEWWXXl/I1xaUVVPRQu1CDhbp7Qi1INam+8YJAlWVVFPsSdDTt1d1zi8iU161UmY/XULpSDQ== vlad@vlad-korolevs-macbook-air.local
+

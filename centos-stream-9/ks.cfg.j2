@@ -13,7 +13,6 @@ network --bootproto=dhcp --hostname=centos9-tmpl
 rootpw --plaintext {{ env("ssh_password") }}
 sshkey --username root "{{ env("ssh_public_key") }}"
 
-
 firewall --disabled
 selinux --permissive
 timezone UTC
@@ -32,7 +31,6 @@ reboot --eject
 
 user --name={{ env("vm_default_user") }} --password {{ env("ssh_password") }}  --plaintext 
 sshkey --username {{ env("vm_default_user") }} "{{ env("ssh_public_key") }}"
-
 
 %pre
 # Enable persistent journal from the getgo
@@ -53,23 +51,23 @@ done &
 
 %packages --ignoremissing --excludedocs --inst-langs=en_US.utf8
 @core
-redhat-lsb-core
-qemu-guest-agent
-curl
-wget
-ntpdate
-net-tools
-vim-enhanced
 bash-completion
-yum-utils
-tar
 bzip2
+curl
 deltarpm
-openssh-clients
-sudo
-selinux-policy-devel
+net-tools
 nfs-utils
+ntpdate
+openssh-clients
+qemu-guest-agent
+redhat-lsb-core
 rsync
+selinux-policy-devel
+sudo
+tar
+vim-enhanced
+wget
+yum-utils
 -fprintd-pam
 -intltool
 
@@ -138,7 +136,6 @@ NAME=eth0
 DEVICE=eth0
 ONBOOT=yes
 _EOF_
-
 
 # cut drac
 time dracut --no-hostonly --force

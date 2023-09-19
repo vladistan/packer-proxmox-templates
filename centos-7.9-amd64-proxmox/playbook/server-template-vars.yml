@@ -36,9 +36,15 @@ iserver_deb_packages:
 
 iserver_rpm_packages:
   - redhat-lsb-core
-  - wget
   - curl
+  - haveged          # prevent vm boot delays
   - htop
+  - ncdu
+  - net-tools        # includes ifconfig, netstat
+  - psmisc           # includes pstree
+  - pv
+  - tmux
+  - wget
 
 iserver_centos_enable_epel: true
 

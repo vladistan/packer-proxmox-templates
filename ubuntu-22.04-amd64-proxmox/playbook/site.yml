@@ -1,0 +1,7 @@
+---
+# This playbook is used to develop and test the initial server
+# role. It is not used to create the server template.
+
+- hosts: all
+  roles:
+    - ansible-initial-server

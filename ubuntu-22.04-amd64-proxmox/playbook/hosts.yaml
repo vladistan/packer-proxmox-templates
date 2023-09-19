@@ -1,0 +1,21 @@
+---
+# This inventory file is used for developing and testing of the
+# ansible playbook.  It is not used to create the server template.
+all:
+  hosts:
+    192.168.15.168:
+  vars:
+    ansible_user: vlad
+    iserver_sshkey: "{{ lookup('file', '~/.ssh/id_rsa.vlad.pub') }}"
+    iserver_user: vlad
+    iserver_rpm_packages:
+      - htop
+      - curl
+      - haveged          # prevent vm boot delays
+      - ncdu
+      - net-tools        # includes ifconfig, netstat
+      - psmisc           # includes pstree
+      - pv
+      - tmux
+      - wget
+    iserver_timezone: America/New_York

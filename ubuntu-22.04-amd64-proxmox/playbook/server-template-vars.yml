@@ -1,6 +1,6 @@
 ---
 
-iserver_hostname: ubuntu2004-kvm
+iserver_hostname: ubuntu2204-kvm
 
 iserver_ubuntu_repos:
   - deb http://archive.ubuntu.com/ubuntu/ jammy main restricted
